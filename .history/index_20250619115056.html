@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Etheria Team Builder</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+      }
+      .champ-grid,
+      .team {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .champ {
+        width: 80px;
+        text-align: center;
+        cursor: grab;
+      }
+      .champ img {
+        width: 100%;
+        border-radius: 8px;
+      }
+      .team-slot {
+        width: 80px;
+        height: 100px;
+        border: 2px dashed #aaa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .team-slot.filled img {
+        border: 2px solid #00bcd4;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Etheria Restart - Build Your Team</h2>
+    <div class="team" id="team"></div>
+    <button onclick="resetTeam()">Reset Team</button>
+
+    <hr />
+    <h3>All Champions</h3>
+    <div class="champ-grid" id="champions"></div>
+
+    <script src="champions.js"></script>
+  </body>
+</html>
