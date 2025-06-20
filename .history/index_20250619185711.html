@@ -12,8 +12,7 @@
         <button onclick="deleteTeam()">Delete Team</button>
         <button id="undoButton" onclick="undoAction()" disabled>Undo</button>
         <button onclick="resetTeam()">Reset Team</button>
-        <!-- <button onclick="takeScreenshot()">Screenshot</button> -->
-        <!-- <button onclick="saveToCollection()">Save to Collection</button> -->
+        <button onclick="saveToCollection()">Save to Collection</button>
       </div>
       <div class="content">
         <div class="ether">Etheria Restart - Build Your Team</div>
@@ -23,8 +22,12 @@
         </div>
         <div class="team" id="team"></div>
         <div class="error" id="error"></div>
+        <div class="modules">
+          <h4>Modules</h4>
+          <select id="moduleSelect" onchange="displayModuleInfo()"></select>
+          <div id="moduleInfo"></div>
+        </div>
         <!-- <div class="collections" id="collections"></div> -->
-
         <hr />
         <div class="champ-grid" id="champions"></div>
       </div>

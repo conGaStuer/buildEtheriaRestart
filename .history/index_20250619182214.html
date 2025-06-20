@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="index.css" />
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Etheria Team Builder</title>
+  </head>
+  <body>
+    <section>
+      <div class="content">
+        <div class="controls">
+          <button onclick="editTeamName()">&#9998;</button>
+          <select id="teamSelect" onchange="switchTeam(this.value)"></select>
+
+          <button onclick="addTeam()">Add Team</button>
+          <button onclick="deleteTeam()">Delete Team</button>
+          <button id="undoButton" onclick="undoAction()" disabled>Undo</button>
+          <button onclick="resetTeam()">Reset Team</button>
+          <button onclick="takeScreenshot()">Screenshot</button>
+          <button onclick="saveToCollection()">Save to Collection</button>
+        </div>
+        <div class="ether">Etheria Restart - Build Your Team</div>
+
+        <div class="team" id="team"></div>
+        <div class="error" id="error"></div>
+        <div class="collections" id="collections"></div>
+
+        <hr />
+        <h3>All Champions</h3>
+        <div class="champ-grid" id="champions"></div>
+      </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="champions.js"></script>
+  </body>
+</html>

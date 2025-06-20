@@ -4,17 +4,10 @@ let teams = [{ id: 1, name: "Team 1", members: Array(teamSize).fill(null) }];
 let currentTeamId = 1;
 let teamHistory = [];
 let champs = [];
-let collections = JSON.parse(
-  localStorage.getItem("etheria_collections") || "{}"
-);
 
 function saveTeams() {
   localStorage.setItem("etheria_teams", JSON.stringify(teams));
   localStorage.setItem("etheria_current_team_id", currentTeamId);
-}
-
-function saveCollections() {
-  localStorage.setItem("etheria_collections", JSON.stringify(collections));
 }
 
 function loadTeams() {
@@ -56,12 +49,13 @@ function renderTeam() {
     slot.ondrop = (e) => {
       const i = parseInt(e.dataTransfer.getData("text"));
       const selectedChamp = champs[i];
+      // Check if champion is already in the team
       if (
         currentTeam.members.some(
           (member) => member && member["emp-name"] === selectedChamp["emp-name"]
         )
       ) {
-        return;
+        return; // Prevent adding duplicate champion
       }
       saveHistory();
       currentTeam.members[index] = selectedChamp;
@@ -90,22 +84,11 @@ function updateTeamSelect() {
   });
 }
 
-function editTeamName() {
-  const currentTeam = getCurrentTeam();
-  const newName = prompt("Enter new team name:", currentTeam.name);
-  if (newName && newName.trim()) {
-    currentTeam.name = newName.trim();
-    saveTeams();
-    updateTeamSelect();
-  }
-}
-
 function addTeam() {
   const newId = teams.length > 0 ? Math.max(...teams.map((t) => t.id)) + 1 : 1;
-  const newName = prompt("Enter team name:", `Team ${newId}`);
   teams.push({
     id: newId,
-    name: newName && newName.trim() ? newName.trim() : `Team ${newId}`,
+    name: `Team ${newId}`,
     members: Array(teamSize).fill(null),
   });
   currentTeamId = newId;
@@ -142,63 +125,6 @@ function resetTeam() {
   renderTeam();
 }
 
-function saveToCollection() {
-  const collectionName = prompt("Enter collection name (e.g., DokiDoki, PvP):");
-  if (!collectionName || !collectionName.trim()) return;
-  const currentTeam = getCurrentTeam();
-  if (!collections[collectionName]) collections[collectionName] = [];
-  collections[collectionName].push({
-    id: Date.now(),
-    name: currentTeam.name,
-    members: JSON.parse(JSON.stringify(currentTeam.members)),
-  });
-  saveCollections();
-  renderCollections();
-}
-
-function renderCollections() {
-  const collectionsEl = document.getElementById("collections");
-  collectionsEl.innerHTML = "";
-  for (const [name, teams] of Object.entries(collections)) {
-    const collectionDiv = document.createElement("div");
-    collectionDiv.className = "collection";
-    collectionDiv.innerHTML = `<h4>${name}</h4>`;
-    teams.forEach((team, index) => {
-      const teamDiv = document.createElement("div");
-      teamDiv.innerHTML = `${team.name}: ${team.members
-        .map((m) => (m ? m["emp-name"] : "Empty"))
-        .join(", ")} <button onclick="loadCollectionTeam(${
-        team.id
-      })">Load</button>`;
-      collectionDiv.appendChild(teamDiv);
-    });
-    collectionsEl.appendChild(collectionDiv);
-  }
-}
-
-function loadCollectionTeam(teamId) {
-  for (const collectionTeams of Object.values(collections)) {
-    const team = collectionTeams.find((t) => t.id === t.id);
-    if (team) {
-      const newId =
-        teams.length > 0 ? Math.max(...teams.map((t) => t.id)) + 1 : 1;
-      const newTeam = {
-        id: newId,
-        name: team.name,
-        members: JSON.parse(JSON.stringify(team.members)),
-      };
-      teams.push(newTeam);
-      currentTeamId = newId;
-      saveTeams();
-      updateTeamSelect();
-      renderTeam();
-      document.getElementById("undoButton").disabled = true;
-      teamHistory = [];
-      break;
-    }
-  }
-}
-
 function takeScreenshot() {
   const teamEl = document.getElementById("team");
   html2canvas(teamEl).then((canvas) => {
@@ -221,14 +147,6 @@ fetch(CHAMP_JSON)
     data.forEach((champ, index) => {
       const div = document.createElement("div");
       div.className = "champ";
-      const typeUrl = champ["gatsby-image-wrapper src 4"];
-      const champType = typeUrl
-        ? typeUrl.split("/").pop().replace("ele_", "").replace(".webp", "")
-        : "Unknown";
-      div.setAttribute(
-        "data-type",
-        champType.charAt(0).toUpperCase() + champType.slice(1)
-      );
       div.draggable = true;
       div.ondragstart = (e) => e.dataTransfer.setData("text", index);
       div.innerHTML = `<img src="${champ["gatsby-image-wrapper src 2"]}" alt=""><div>${champ["emp-name"]}</div>`;
@@ -237,6 +155,5 @@ fetch(CHAMP_JSON)
     loadTeams();
     updateTeamSelect();
     renderTeam();
-    renderCollections();
   })
   .catch((error) => console.error("Error fetching champions:", error));

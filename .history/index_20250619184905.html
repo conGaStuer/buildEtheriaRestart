@@ -1,9 +1,9 @@
 <!DOCTYPE html>
+<link rel="stylesheet" href="index.css" />
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <title>Etheria Team Builder</title>
-    <link rel="stylesheet" href="index.css" />
   </head>
   <body>
     <section>
@@ -13,12 +13,12 @@
         <button id="undoButton" onclick="undoAction()" disabled>Undo</button>
         <button onclick="resetTeam()">Reset Team</button>
         <!-- <button onclick="takeScreenshot()">Screenshot</button> -->
-        <!-- <button onclick="saveToCollection()">Save to Collection</button> -->
+        <button onclick="saveToCollection()">Save to Collection</button>
       </div>
       <div class="content">
         <div class="ether">Etheria Restart - Build Your Team</div>
         <div class="name">
-          <button onclick="editTeamName()">✎</button>
+          <button onclick="editTeamName()">&#9998;</button>
           <select id="teamSelect" onchange="switchTeam(this.value)"></select>
         </div>
         <div class="team" id="team"></div>

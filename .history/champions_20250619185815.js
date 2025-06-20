@@ -1,9 +1,10 @@
-const CHAMP_JSON = "champions.json";
+const DB_JSON = "database.json";
 const teamSize = 5;
 let teams = [{ id: 1, name: "Team 1", members: Array(teamSize).fill(null) }];
 let currentTeamId = 1;
 let teamHistory = [];
 let champs = [];
+let modules = [];
 let collections = JSON.parse(
   localStorage.getItem("etheria_collections") || "{}"
 );
@@ -70,7 +71,7 @@ function renderTeam() {
     };
     if (champ) {
       const img = document.createElement("img");
-      img.src = champ["gatsby-image-wrapper src 2"];
+      img.src = champ["image"];
       img.title = champ["emp-name"];
       slot.appendChild(img);
     }
@@ -178,7 +179,7 @@ function renderCollections() {
 
 function loadCollectionTeam(teamId) {
   for (const collectionTeams of Object.values(collections)) {
-    const team = collectionTeams.find((t) => t.id === t.id);
+    const team = collectionTeams.find((t) => t.id === teamId);
     if (team) {
       const newId =
         teams.length > 0 ? Math.max(...teams.map((t) => t.id)) + 1 : 1;
@@ -209,34 +210,65 @@ function takeScreenshot() {
   });
 }
 
-fetch(CHAMP_JSON)
+function renderModuleSelect() {
+  const moduleSelect = document.getElementById("moduleSelect");
+  moduleSelect.innerHTML = '<option value="">Select Module Set</option>';
+  modules.forEach((module) => {
+    const option = document.createElement("option");
+    option.value = module.set;
+    option.text = module.set;
+    moduleSelect.appendChild(option);
+  });
+}
+
+function displayModuleInfo() {
+  const moduleSelect = document.getElementById("moduleSelect");
+  const moduleInfo = document.getElementById("moduleInfo");
+  const selectedSet = moduleSelect.value;
+  if (!selectedSet) {
+    moduleInfo.innerHTML = "";
+    return;
+  }
+  const module = modules.find((m) => m.set === selectedSet);
+  if (module) {
+    moduleInfo.innerHTML = `
+      <p><strong>Set:</strong> ${module.set}</p>
+      <p><strong>Matrix Levels:</strong> ${module.matrix_levels.join(", ")}</p>
+      <p><strong>Effects:</strong> ${module.effects
+        .map((e) => `${e.level}: ${e.effect}`)
+        .join("<br>")}</p>
+      <p><strong>Main Stats:</strong> ${module.main_stats.join(", ")}</p>
+      <p><strong>Sub Stats:</strong> ${module.sub_stats.join(", ")}</p>
+      <p><strong>Drop:</strong> ${module.drop}</p>
+    `;
+  }
+}
+
+fetch(DB_JSON)
   .then((res) => {
     if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
     return res.json();
   })
   .then((data) => {
-    console.log("JSON Data:", data);
-    champs = data;
+    console.log("Database:", data);
+    champs = data.champions;
+    modules = data.modules;
     const grid = document.getElementById("champions");
-    data.forEach((champ, index) => {
+    champs.forEach((champ, index) => {
       const div = document.createElement("div");
       div.className = "champ";
-      const typeUrl = champ["gatsby-image-wrapper src 4"];
-      const champType = typeUrl
-        ? typeUrl.split("/").pop().replace("ele_", "").replace(".webp", "")
-        : "Unknown";
-      div.setAttribute(
-        "data-type",
-        champType.charAt(0).toUpperCase() + champType.slice(1)
-      );
+      const typeMatch = champ["emp-name"].match(/\[([^\]]+)\]/);
+      const champType = typeMatch ? typeMatch[1] : "Unknown";
+      div.setAttribute("data-type", champType);
       div.draggable = true;
       div.ondragstart = (e) => e.dataTransfer.setData("text", index);
-      div.innerHTML = `<img src="${champ["gatsby-image-wrapper src 2"]}" alt=""><div>${champ["emp-name"]}</div>`;
+      div.innerHTML = `<img src="${champ["image"]}" alt=""><div>${champ["emp-name"]}</div>`;
       grid.appendChild(div);
     });
+    renderModuleSelect();
     loadTeams();
     updateTeamSelect();
     renderTeam();
     renderCollections();
   })
-  .catch((error) => console.error("Error fetching champions:", error));
+  .catch((error) => console.error("Error fetching database:", error));

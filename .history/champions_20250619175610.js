@@ -177,23 +177,20 @@ function renderCollections() {
 }
 
 function loadCollectionTeam(teamId) {
-  for (const collectionTeams of Object.values(collections)) {
-    const team = collectionTeams.find((t) => t.id === t.id);
+  for (const teams of Object.values(collections)) {
+    const team = teams.find((t) => t.id === teamId);
     if (team) {
       const newId =
         teams.length > 0 ? Math.max(...teams.map((t) => t.id)) + 1 : 1;
-      const newTeam = {
+      teams.push({
         id: newId,
         name: team.name,
         members: JSON.parse(JSON.stringify(team.members)),
-      };
-      teams.push(newTeam);
+      });
       currentTeamId = newId;
       saveTeams();
       updateTeamSelect();
       renderTeam();
-      document.getElementById("undoButton").disabled = true;
-      teamHistory = [];
       break;
     }
   }
@@ -221,14 +218,6 @@ fetch(CHAMP_JSON)
     data.forEach((champ, index) => {
       const div = document.createElement("div");
       div.className = "champ";
-      const typeUrl = champ["gatsby-image-wrapper src 4"];
-      const champType = typeUrl
-        ? typeUrl.split("/").pop().replace("ele_", "").replace(".webp", "")
-        : "Unknown";
-      div.setAttribute(
-        "data-type",
-        champType.charAt(0).toUpperCase() + champType.slice(1)
-      );
       div.draggable = true;
       div.ondragstart = (e) => e.dataTransfer.setData("text", index);
       div.innerHTML = `<img src="${champ["gatsby-image-wrapper src 2"]}" alt=""><div>${champ["emp-name"]}</div>`;
